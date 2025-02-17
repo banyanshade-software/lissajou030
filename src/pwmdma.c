@@ -180,10 +180,10 @@ void sigGenTask(void const * argument)
 {
 	itm_debug1(DBG_ERR, "go1", 1);
 
-	fillsine(&gen[0], 3000.);
-	fillsine(&gen[1], 2700.);
-	fillsine(&gen[2], 2300.);
-	fillsine(&gen[3], 1200.);
+	fillsine(&gen[0], 300.);
+	fillsine(&gen[1], 400.);
+	//fillsine(&gen[2], 2300.);
+	//fillsine(&gen[3], 1200.);
 
 	itm_debug1(DBG_ERR, "go2", 2);
 	pwmdma_start();
