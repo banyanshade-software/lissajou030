@@ -22,7 +22,7 @@
 
 #include <math.h>
 
-#define USE_DMA 0
+#define USE_DMA 1
 
 #define MAXBUF 1024
 #define BASEFREQ  50000
@@ -130,10 +130,10 @@ static void pwmdma_start(void)
 {
 #if USE_DMA
 	HAL_TIM_Base_Start(&htim1);
-	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, buf1, buflen1);
-	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf2, buflen2);
-	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf3, buflen2);
-	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf4, buflen2);
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *)gen[0].buf, gen[0].buflen);
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, (uint32_t *)gen[1].buf, gen[1].buflen);
+	//HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf3, buflen2);
+	//HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf4, buflen2);
 #else
 	HAL_TIM_Base_Start_IT(&htim1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
@@ -143,6 +143,35 @@ static void pwmdma_start(void)
 #endif
 
 }
+
+
+#if USE_DMA
+volatile static int cnth2 = 0;
+volatile static int cntf2 = 0;
+
+volatile static int cnth1 = 0;
+volatile static int cntf1 = 0;
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+	if ( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) cnth2++;
+	else cnth1++;
+}
+void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim)
+{
+	if ( htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) cntf2++;
+	else cntf1++;
+}
+
+void chktim(void)
+{
+	cntf1 = cntf2 = 0;
+	cnth1 = cnth2 = 0;
+}
+
+
+
+#endif
 
 void pwm_tim_it(void)
 {
